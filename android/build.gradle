@@ -43,7 +43,6 @@ android {
   }
 
   dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
   }
 }
