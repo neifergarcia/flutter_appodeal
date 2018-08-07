@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/services.dart';
 
 enum AppodealAdType {
@@ -77,8 +78,7 @@ class FlutterAppodeal {
   );
 
   FlutterAppodeal.private(MethodChannel channel) : _channel = channel {
-    _channel.setMethodCallHandler(_handleMethodRewardedVideo);
-    _channel.setMethodCallHandler(_handleMethodNativeAd);
+    _channel.setMethodCallHandler(_handleMethodCall);
   }
 
   static FlutterAppodeal get instance => _instance;
@@ -143,26 +143,7 @@ class FlutterAppodeal {
     return result;
   }
 
-  Future<dynamic> _handleMethodRewardedVideo(MethodCall call) {
-    final Map<dynamic, dynamic> argumentsMap = call.arguments;
-    final RewardedVideoAdEvent rewardedEvent =
-    _methodToRewardedVideoAdEvent[call.method];
-    if (rewardedEvent != null && shouldCallListener) {
-      if (this.videoListener != null) {
-        if (rewardedEvent == RewardedVideoAdEvent.finish && argumentsMap != null) {
-          this.videoListener(rewardedEvent,
-              rewardType: argumentsMap['rewardType'],
-              rewardAmount: argumentsMap['rewardAmount']);
-        } else {
-          this.videoListener(rewardedEvent);
-        }
-      }
-    }
-
-    return new Future<Null>(null);
-  }
-
-  Future<dynamic> _handleMethodNativeAd(MethodCall call) {
+  Future<dynamic> _handleMethodCall(MethodCall call) {
     final Map<dynamic, dynamic> argumentsMap = call.arguments;
     final NativeAdEvent nativeAdEvent = _methodToNativeAdEvent[call.method];
     if (nativeAdEvent != null && enableNativeListener) {
@@ -189,8 +170,22 @@ class FlutterAppodeal {
           this.getNativeAdListener();
         }
       }
-    }else{
-      print("No Apply: " + call.method);
+    }
+    else{
+      final RewardedVideoAdEvent rewardedEvent = _methodToRewardedVideoAdEvent[call.method];
+      if (rewardedEvent != null && shouldCallListener) {
+        if (this.videoListener != null) {
+          if (rewardedEvent == RewardedVideoAdEvent.finish && argumentsMap != null) {
+            this.videoListener(rewardedEvent,
+                rewardType: argumentsMap['rewardType'],
+                rewardAmount: argumentsMap['rewardAmount']);
+          } else {
+            this.videoListener(rewardedEvent);
+          }
+        }
+      }else {
+        print("No Apply: " + call.method);
+      }
     }
 
     return new Future<Null>(null);
