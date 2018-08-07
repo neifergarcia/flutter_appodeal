@@ -34,10 +34,16 @@ typedef void NativeAdListener(NativeAdEvent event,{
   double rating, String callToAction, String imageUrl
 });
 
+typedef void GetNativeAdListener({
+  int index, String title, String description,
+  double rating, String callToAction, String imageUrl
+});
+
 class FlutterAppodeal {
 
   bool shouldCallListener;
   bool enableNativeListener;
+  bool enableNativeAd;
 
   final MethodChannel _channel;
 
@@ -46,6 +52,8 @@ class FlutterAppodeal {
 
   /// Called when status of NativeAd change
   NativeAdListener nativeAdListener;
+
+  GetNativeAdListener getNativeAdListener;
 
   static const Map<String, RewardedVideoAdEvent> _methodToRewardedVideoAdEvent =
   const <String, RewardedVideoAdEvent>{
@@ -116,6 +124,11 @@ class FlutterAppodeal {
     });
   }
 
+  Future getNativeAd() async{
+    enableNativeAd = true;
+    _channel.invokeMethod('getNativeAd');
+  }
+
   Future nativeAdClick(int indexViewClick) async{
     enableNativeListener = true;
     _channel.invokeMethod('onClickNativeAd', <String, dynamic>{
@@ -156,12 +169,24 @@ class FlutterAppodeal {
       if (this.nativeAdListener != null) {
         if (argumentsMap != null) {
           this.nativeAdListener(nativeAdEvent,
-            index: argumentsMap["index"], title: argumentsMap["title"],
-            description: argumentsMap["description"], rating: argumentsMap["rating"],
-            callToAction: argumentsMap["callToAction"], imageUrl: argumentsMap["imageUrl"]
+              index: argumentsMap["index"], title: argumentsMap["title"],
+              description: argumentsMap["description"], rating: argumentsMap["rating"],
+              callToAction: argumentsMap["callToAction"], imageUrl: argumentsMap["imageUrl"]
           );
         }else{
           this.nativeAdListener(nativeAdEvent);
+        }
+      }
+    }else if (call.method == "getNativeAd" && enableNativeAd) {
+      if (this.getNativeAdListener != null) {
+        if (argumentsMap != null) {
+          this.getNativeAdListener(
+              index: argumentsMap["index"], title: argumentsMap["title"],
+              description: argumentsMap["description"], rating: argumentsMap["rating"],
+              callToAction: argumentsMap["callToAction"], imageUrl: argumentsMap["imageUrl"]
+          );
+        }else{
+          this.getNativeAdListener();
         }
       }
     }else{

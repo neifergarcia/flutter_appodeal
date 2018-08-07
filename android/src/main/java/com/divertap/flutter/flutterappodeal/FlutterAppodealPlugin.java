@@ -72,7 +72,9 @@ public class FlutterAppodealPlugin implements MethodCallHandler, RewardedVideoCa
         for (int type2 : types) {
           type = type | this.appodealAdType(type2);
         }
+        // Appodeal.setAutoCache(Appodeal.NATIVE, false);
         Appodeal.initialize(activity, appKey, type);
+        // Appodeal.cache(activity, Appodeal.NATIVE, 5);
         result.success(Boolean.TRUE);
         break;
       }
@@ -100,6 +102,23 @@ public class FlutterAppodealPlugin implements MethodCallHandler, RewardedVideoCa
 
         Appodeal.cache(activity, Appodeal.NATIVE);
         result.success(Boolean.TRUE);
+        break;
+      }
+      case "getNativeAd":{
+        if (listNativeAd.size() > 0) {
+          Random rand = new Random();
+          int index = rand.nextInt(listNativeAd.size() - 1); // 0 - size
+          NativeAd nNativeAd = listNativeAd.get(index);
+          channel.invokeMethod("getNativeAd", argumentsMap(
+            "index", index, "title", nNativeAd.getTitle(),
+            "description", nNativeAd.getDescription(),
+            "rating", nNativeAd.getRating(),
+            "callToAction", nNativeAd.getCallToAction(),
+            "imageUrl", nNativeAd.getMainImageUrl()
+          ));
+        }else{
+          channel.invokeMethod("getNativeAd", argumentsMap());
+        }
         break;
       }
       case "onClickNativeAd":{
