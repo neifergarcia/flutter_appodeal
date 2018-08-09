@@ -105,12 +105,21 @@ public class FlutterAppodealPlugin implements MethodCallHandler, RewardedVideoCa
         break;
       }
       case "getNativeAd":{
-        if (listNativeAd.size() > 0) {
+        if (listNativeAd.size() > 1) {
           Random rand = new Random();
           int index = rand.nextInt(listNativeAd.size() - 1); // 0 - size
           NativeAd nNativeAd = listNativeAd.get(index);
           channel.invokeMethod("getNativeAd", argumentsMap(
             "index", index, "title", nNativeAd.getTitle(),
+            "description", nNativeAd.getDescription(),
+            "rating", nNativeAd.getRating(),
+            "callToAction", nNativeAd.getCallToAction(),
+            "imageUrl", nNativeAd.getMainImageUrl()
+          ));
+        } else if(listNativeAd.size() > 0){
+          NativeAd nNativeAd = listNativeAd.get(0);
+          channel.invokeMethod("getNativeAd", argumentsMap(
+            "index", 0, "title", nNativeAd.getTitle(),
             "description", nNativeAd.getDescription(),
             "rating", nNativeAd.getRating(),
             "callToAction", nNativeAd.getCallToAction(),
